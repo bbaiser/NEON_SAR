@@ -47,6 +47,8 @@ sp_rich_beetle = data_beetle |>
             land_class = unique(nlcdClass)[1],
             .groups = "drop")
 
+
+write.csv(sp_rich_beetle,"Data/sp_rich_beetle.csv")
 # birds ----
 View(data_bird)
 
