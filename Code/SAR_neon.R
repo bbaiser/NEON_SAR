@@ -26,6 +26,9 @@ table(data_beetle$variable_name)
 n_distinct(data_beetle$plotID) # 511 plots
 summary(data_beetle$value) # all abundance > 0
 
+
+
+
 #How many plots per site?
 data_beetle |> 
   group_by(siteID) |> 
