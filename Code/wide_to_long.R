@@ -35,11 +35,62 @@ for(i in varlist) {
  }
 
 #the sp. accum. curves for each site
-rich
+plot_num<-df2%>%
+          count(siteID)
+ 
+
+lapply(plot_num$n,rep.int(40, times=plot_num$n))
+
+data <- data.frame(NA_col = rep(NA, 47))     # Creating data containing NA
+data<-list()
+
+plotnum<-plot_num$n
+sizes <- list()
+sizes
+plotnum<-c(plot_num$n,2)
+for(i in length(plotnum)){
+       da<-rep.int(40, times=plotnum[i])
+       print(da)
+}
+da
+sizes
+lapply(plot_num$n,rep,x=40,times=2)
+
+my_func<-function(plots,size){
+         output<-rep.int(size, plots)
+         return()
+}
 
 
+plotnum<-plot_num$n
+
+for(i in 1:length(plotnum){
+  pn<-my_func(40, i)
+  return(pn)
+}
+
+pn
+my_func(10,40)
+
+apply(plot_num$n,1,my_func,size=40,plots=2)
+
+input_1 <- 20
+mySum <- function(input_1, input_2 = 10) {
+  output <- input_1 + input_2
+  return(output)
+}
+
+rep.int()
+}
+dim(rep.int(40, times=2))
 
 
+length (rich[2])
+   library(stringi)
 
+   cbind(plot_num,rep=stri_dup("40 ",plot_num$n))
 
+   cumsum(c(40,40,40)
+       
+       rep(1:4, c(2,1,2,1))   
        
