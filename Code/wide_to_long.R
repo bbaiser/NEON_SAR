@@ -34,25 +34,34 @@ for(i in varlist) {
     rich[[i]]<-acc$richness#extract the richness for each site number
  }
 
-#the sp. accum. curves for each site
+#this is the number of plots at each location
 plot_num<-df2%>%
           count(siteID)
- 
 
+#this is afunction that allows you to repeat something a certian ammount of times
+rep.int(40, times=11)
+
+#here is my attempt at lapply over the different plot numbers in plot_num$n
 lapply(plot_num$n,rep.int(40, times=plot_num$n))
 
-data <- data.frame(NA_col = rep(NA, 47))     # Creating data containing NA
+#here is my attempt to make empty objects for a for loop
+data <- data.frame(NA_col = rep(NA, 47))     # Creating dataframe containing NA
 data<-list()
 
+
+#just makea vector of plot numbers
 plotnum<-plot_num$n
-sizes <- list()
-sizes
-plotnum<-c(plot_num$n,2)
+
+#forloop only returns last row...
+
 for(i in length(plotnum)){
-       da<-rep.int(40, times=plotnum[i])
-       print(da)
+       data<-rep.int(40, times=plotnum[i])
+       
 }
-da
+data
+
+
+#####extra junk####
 sizes
 lapply(plot_num$n,rep,x=40,times=2)
 
