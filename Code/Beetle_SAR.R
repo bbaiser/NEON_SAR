@@ -12,12 +12,13 @@ library(dplyr)
 install.packages("sars")
 library(sars)
 
+
 ####Beetles####
 #get pres/abs for each species per site
 beetle_df <- data_beetle %>% 
        mutate(present = 1) %>% 
        pivot_wider(names_from = taxon_name, values_from = present) %>% 
-      mutate_at(vars(unique(data_beetle$taxon_name)), ~ifelse(is.na(.), 0, 1))%>%
+       mutate_at(vars(unique(data_beetle$taxon_name)), ~ifelse(is.na(.), 0, 1))%>%
        select(2,3,22:789)%>% 
        group_by(plotID,siteID)%>% 
        summarise(across(everything(), list(sum)))%>% 
@@ -440,3 +441,29 @@ for(i in 1:46){
 
 #data frame with parameters(note that c (intercept) is back transformed)
 tick_params
+
+
+
+#get latitude data
+site_data<-read.csv("Data/NEON_Field_Site_Metadata_20220412.csv")%>%
+           select(2,12,13,21:25)%>%
+           rename(siteID=field_site_id,lat=field_latitude,long=field_longitude,mean_elev= field_mean_elevation_m,min_elev=field_minimum_elevation_m,
+                  max_elev=field_maximum_elevation_m,mean_temp=field_mean_annual_temperature_C, mean_precip=field_mean_annual_precipitation_mm)
+          
+
+
+
+#Beetle Lat analysis
+
+
+comb_beetle<-beetle_params%>%
+             rownames_to_column( "siteID")%>%
+             left_join(site_data,by="siteID")
+
+lat_mod<-lm(z~mean_temp+c+min_elev, data=comb_beetle)            
+summary(lat_mod) 
+
+plot(comb_beetle$lat,comb_beetle$z)
+  
+  
+pairs(comb_beetle[,c(2:10)]) 
