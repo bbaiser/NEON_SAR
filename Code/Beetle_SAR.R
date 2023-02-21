@@ -453,17 +453,47 @@ site_data<-read.csv("Data/NEON_Field_Site_Metadata_20220412.csv")%>%
 
 
 
-#Beetle Lat analysis
+####Beetle Lat analysis####
 
 
 comb_beetle<-beetle_params%>%
              rownames_to_column( "siteID")%>%
              left_join(site_data,by="siteID")
 
-lat_mod<-lm(z~mean_temp+c+min_elev, data=comb_beetle)            
+lat_mod<-lm(log(c)~mean_precip, data=comb_beetle)            
 summary(lat_mod) 
 
-plot(comb_beetle$lat,comb_beetle$z)
+plot(comb_beetle$long,comb_beetle$c)
   
   
 pairs(comb_beetle[,c(2:10)]) 
+
+
+####Bird Lat analysis####
+comb_bird<-bird_params%>%
+           rownames_to_column( "siteID")%>%
+           left_join(site_data,by="siteID")
+
+lat_mod<-lm(log(c)~long, data=comb_bird)            
+summary(lat_mod) 
+
+plot(comb_ird$lat,comb_beetle$z)
+
+
+pairs(comb_bird[,c(2:10)]) 
+
+
+####mammal Lat analysis####
+
+
+comb_mammal<-mammal_params%>%
+             rownames_to_column( "siteID")%>%
+             left_join(site_data,by="siteID")
+
+lat_mod<-lm(log(c)~long, data=comb_mammal)            
+summary(lat_mod) 
+
+plot(comb_mammal$long,comb_mammal$c)
+
+
+pairs(comb_mammal[,c(2:10)]) 
