@@ -460,11 +460,11 @@ comb_beetle<-beetle_params%>%
              rownames_to_column( "siteID")%>%
              left_join(site_data,by="siteID")
 
-lat_mod<-lm(log(c)~mean_precip, data=comb_beetle)            
+lat_mod<-lm(z~mean_temp, data=comb_beetle)            
 summary(lat_mod) 
 
-plot(comb_beetle$long,comb_beetle$c)
-  
+plot(comb_beetle$mean_temp,comb_beetle$z, xlab="mean temperature", ylab="beetle z")
+abline(lat_mod<-lm(z~mean_temp, data=comb_beetle))  
   
 pairs(comb_beetle[,c(2:10)]) 
 
@@ -474,11 +474,11 @@ comb_bird<-bird_params%>%
            rownames_to_column( "siteID")%>%
            left_join(site_data,by="siteID")
 
-lat_mod<-lm(log(c)~long, data=comb_bird)            
+lat_mod<-lm(z~long, data=comb_bird)            
 summary(lat_mod) 
 
-plot(comb_ird$lat,comb_beetle$z)
-
+plot(comb_bird$long,comb_bird$z,xlab="longitude", ylab="bird z")
+abline(lat_mod )
 
 pairs(comb_bird[,c(2:10)]) 
 
@@ -490,10 +490,10 @@ comb_mammal<-mammal_params%>%
              rownames_to_column( "siteID")%>%
              left_join(site_data,by="siteID")
 
-lat_mod<-lm(log(c)~long, data=comb_mammal)            
+lat_mod<-lm(z~mean_temp, data=comb_mammal)            
 summary(lat_mod) 
 
-plot(comb_mammal$long,comb_mammal$c)
-
+plot(comb_mammal$mean_temp,comb_mammal$z,xlab="mean temperature", ylab="mammal z")
+abline(lat_mod)
 
 pairs(comb_mammal[,c(2:10)]) 
