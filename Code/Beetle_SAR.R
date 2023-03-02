@@ -192,8 +192,9 @@ bird_params
 ####Plants####
 
 #get pres/abs for each species per site
+
 df_plant <- data_plant  %>% 
-  mutate(present = 1) %>% 
+  mutate(present = 1) %>%
   pivot_wider(names_from = taxon_name, values_from = present) %>% 
   mutate_at(vars(unique(data_plant$taxon_name)), ~ifelse(is.na(.), 0, 1))%>%
   select(2,3,35:610)%>% 
