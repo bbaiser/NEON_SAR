@@ -12,29 +12,33 @@ site_data<-read.csv("Data/NEON_Field_Site_Metadata_20220412.csv")%>%
 
 ####Beetle Lat analysis####
 beetle_params<-read.csv("Data/beetle_params.csv")
+beetle_vars<-read.csv("Data/beetle_vars.csv",row=1)
 
 comb_beetle<-beetle_params%>%
              rename(siteID=X)%>%
-             left_join(site_data,by="siteID")
+             left_join(site_data,by="siteID")%>%
+             left_join(beetle_vars,by="siteID")
 
-lat_mod<-lm(z~mean_temp, data=comb_beetle)            
+lat_mod<-lm(z~nlcd, data=comb_beetle)            
 summary(lat_mod) 
 
 plot(comb_beetle$mean_temp,comb_beetle$z, xlab="mean temperature", ylab="beetle z")
 abline(lat_mod<-lm(z~mean_temp, data=comb_beetle))  
 
-pairs(comb_beetle[,c(2:10)]) 
+pairs(comb_beetle[,c(2:12)]) 
 
 
 ####Bird Lat analysis####
 
 bird_params<-read.csv("Data/bird_params.csv")
+bird_vars<-read.csv("Data/bird_vars.csv",row=1)
 
 comb_bird<-bird_params%>%
            rename(siteID=X)%>%
-           left_join(site_data,by="siteID")
+           left_join(site_data,by="siteID")%>%
+           left_join(bird_vars,by="siteID")
 
-lat_mod<-lm(z~long, data=comb_bird)            
+lat_mod<-lm(z~elv_cv, data=comb_bird)            
 summary(lat_mod) 
 
 plot(comb_bird$long,comb_bird$z,xlab="longitude", ylab="bird z")
@@ -46,12 +50,14 @@ pairs(comb_bird[,c(2:10)])
 ####mammal Lat analysis####
 
 mammal_params<-read.csv("Data/mammal_params.csv")
+mammal_vars<-read.csv("Data/mammal_vars.csv",row=1)
 
 comb_mammal<-mammal_params%>%
              rename(siteID=X)%>%
-             left_join(site_data,by="siteID")
+             left_join(site_data,by="siteID")%>%
+             left_join(mammal_vars,by="siteID")
 
-lat_mod<-lm(z~mean_temp, data=comb_mammal)            
+lat_mod<-lm(z~nlcd, data=comb_mammal)            
 summary(lat_mod) 
 
 plot(comb_mammal$mean_temp,comb_mammal$z,xlab="mean temperature", ylab="mammal z")
@@ -63,12 +69,14 @@ pairs(comb_mammal[,c(2:10)])
 ####plant Lat analysis####
 
 plant_params<-read.csv("Data/plant_params.csv")
+plant_vars<-read.csv("Data/plant_vars.csv",row=1)
 
 comb_plant<-plant_params%>%
-             rename(siteID=X)%>%
-             left_join(site_data,by="siteID")
+            rename(siteID=X)%>%
+            left_join(site_data,by="siteID")%>%
+            left_join(plant_vars,by="siteID")
 
-lat_mod<-lm(z~c+long+mean_temp+mean_precip, data=comb_plant)            
+lat_mod<-lm(z~nlcd, data=comb_plant)            
 summary(lat_mod) 
 
 plot(comb_mammal$mean_temp,comb_mammal$z,xlab="mean temperature", ylab="mammal z")
