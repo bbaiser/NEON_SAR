@@ -94,6 +94,7 @@ for(i in 1:47){
 #data frame with parameters(note that c (intercept) is back transformed)
 beetle_params
 
+write.csv(beetle_params,"./data/beetle_params.csv")
 #fit multiple models#
 #fitC <- sar_multi(data = t_dat, obj = c("power", "loga", "monod"))
 
@@ -200,6 +201,8 @@ for(i in 1:47){
 #data frame with parameters(note that c (intercept) is back transformed)
 plant_params
 
+
+write.csv(plant_params,"./data/plant_params.csv")
 #fit multiple models#
 #fitC <- sar_multi(data = t_dat, obj = c("power", "loga", "monod"))
 
@@ -291,6 +294,8 @@ for(i in 1:47){
 
 #data frame with parameters(note that c (intercept) is back transformed)
 bird_params
+
+write.csv(bird_params,"./data/bird_params.csv")
 
 #fit multiple models#
 #fitC <- sar_multi(data = t_dat, obj = c("power", "loga", "monod"))
@@ -402,6 +407,8 @@ for(i in 1:46){
 
 #data frame with parameters(note that c (intercept) is back transformed)
 mammal_params
+
+write.csv(mammal_params,"./data/mammal_params.csv")
 
 #fit multiple models#
 #fitC <- sar_multi(data = t_dat, obj = c("power", "loga", "monod"))
