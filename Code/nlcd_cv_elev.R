@@ -27,7 +27,8 @@ nlcd_div_beetle<- data_beetle%>%
           mutate(nlcd_div=(diversity(.)))%>%
           select(nlcd_div)%>%
           rownames_to_column("siteID")
-#Calculate cv of polt elevations per cite and number of habitat types for each sitte
+
+#Calculate cv of plot elevations per cite and number of habitat types for each sitte
 beetle_vars <- data_beetle%>%
                select(siteID, plotID, elevation,nlcdClass)%>%
                unique(.)%>%
