@@ -89,26 +89,33 @@ plant_vars <- data_plant%>%
               summarise(elv_cv= sd(elevation)/mean(elevation), nlcd= n_distinct(nlcdClass))%>%
               left_join(nlcd_div_plant,by="siteID")
 
-              left_join(nlcd_div_bird,by="siteID")
-bird_vars <- data_bird%>%
-  select(siteID, plotID, elevation,nlcdClass)%>%
-  unique(.)%>%
-  group_by(siteID)%>%
-  summarise(elv_cv= sd(elevation)/mean(elevation), nlcd= n_distinct(nlcdClass))%>%
-  left_join(nlcd_div_bird,by="siteID")
-
+              
 write.csv(plant_vars,"./data/plant_vars.csv")
 
 
 ####small mammals####
 
 #extract plot level variables
+
+nlcd_div_mammal<-data_small_mammal%>%
+                select(siteID, plotID, elevation,nlcdClass)%>%
+                unique(.)%>%
+                group_by(siteID,nlcdClass)%>%
+                count()%>%
+                pivot_wider(names_from = "nlcdClass",  values_from = n,values_fill = 0)%>%
+                column_to_rownames("siteID")%>%
+                mutate(nlcd_div=(diversity(.)))%>%
+                select(nlcd_div)%>%
+                rownames_to_column("siteID")
+
+
+
 mammal_vars <- data_small_mammal%>%
                select(siteID, plotID, elevation,nlcdClass)%>%
                unique(.)%>%
                group_by(siteID)%>%
-               summarise(elv_cv= sd(elevation)/mean(elevation), nlcd= n_distinct(nlcdClass))
-
+               summarise(elv_cv= sd(elevation)/mean(elevation), nlcd= n_distinct(nlcdClass))%>%
+               left_join(nlcd_div_plant,by="siteID")
 
 write.csv(mammal_vars,"./data/mammal_vars.csv")
 
