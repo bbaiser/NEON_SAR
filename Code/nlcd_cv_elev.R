@@ -18,7 +18,7 @@ library(vegan)
 #calculate Shannon diversity for habitat types at each site
 
 nlcd_div_beetle<- data_beetle%>%
-                select(siteID, plotID, elevation,nlcdClass)%>%
+                select(siteID, plotID, nlcdClass)%>%
                 unique(.)%>%
                 group_by(siteID,nlcdClass)%>%
                 count()%>%
@@ -36,6 +36,14 @@ beetle_vars <- data_beetle%>%
                summarise(elv_cv= sd(elevation)/mean(elevation), nlcd= n_distinct(nlcdClass))%>%
                left_join(nlcd_div_beetle,by="siteID")
            
+#get site level richness, sample#, and year sampling began
+sp_rich_beetle <- data_beetle %>% 
+                  group_by(siteID) %>% 
+                  summarise(n_observation = n_distinct(observation_datetime), # how many sample days in total?
+                  start_year = min(lubridate::year(observation_datetime)), # when did it started?
+                  n_sp = n_distinct(taxon_id), # number of unique species
+                  .groups = "drop")
+
 
 write.csv(beetle_vars,"./data/beetle_vars.csv")
 
