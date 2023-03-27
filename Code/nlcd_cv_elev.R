@@ -27,7 +27,7 @@ nlcd_div_beetle<- data_beetle%>%
                 select(nlcd_div)%>%
                 rownames_to_column("siteID")
 
-#Calculate cv of plot elevations per cite and number of habitat types for each site
+#Calculate cv and mean of plot elevations per site and number of habitat types for each site
 elev_vars <- data_beetle%>%
                select(siteID, plotID, elevation,nlcdClass)%>%
                unique(.)%>%
@@ -55,61 +55,46 @@ write.csv(beetle_vars,"./data/beetle_vars.csv")
 
 #extract plot level variables
 #calculate Shannon diversity for habitat types at each site
-nlcd_div_bird<-data_bird%>%
-              select(siteID, plotID, elevation,nlcdClass)%>%
-              unique(.)%>%
-              group_by(siteID,nlcdClass)%>%
-              count()%>%
-              pivot_wider(names_from = "nlcdClass",  values_from = n,values_fill = 0)%>%
-              column_to_rownames("siteID")%>%
-              mutate(nlcd_div=(diversity(.)))%>%
-              select(nlcd_div)%>%
-              rownames_to_column("siteID")
+nlcd_div_bird<- data_bird%>%
+                  select(siteID, plotID, nlcdClass)%>%
+                  unique(.)%>%
+                  group_by(siteID,nlcdClass)%>%
+                  count()%>%
+                  pivot_wider(names_from = "nlcdClass",  values_from = n,values_fill = 0)%>%
+                  column_to_rownames("siteID")%>%
+                  mutate(nlcd_div=(diversity(.)))%>%
+                  select(nlcd_div)%>%
+                  rownames_to_column("siteID")
+
+#Calculate cv and mean of plot elevations per site and number of habitat types for each site
+bird_elev_vars <- data_bird%>%
+                  select(siteID, plotID, elevation,nlcdClass)%>%
+                  unique(.)%>%
+                  group_by(siteID)%>%
+                  summarise(elv_cv= sd(elevation)/mean(elevation), 
+                            mean_elev=mean(elevation),
+                            nlcd= n_distinct(nlcdClass))%>%
+                  left_join(nlcd_div_bird,by="siteID")
 
 
-bird_vars <- data_bird%>%
-             select(siteID, plotID, elevation,nlcdClass)%>%
-             unique(.)%>%
-             group_by(siteID)%>%
-             summarise(elv_cv= sd(elevation)/mean(elevation), nlcd= n_distinct(nlcdClass))%>%
-             left_join(nlcd_div_bird,by="siteID")
+#get site level richness, sample#, and year sampling began
+bird_vars <- data_bird %>% 
+             group_by(siteID) %>% 
+             summarise(n_observation = n_distinct(observation_datetime), # how many sample days in total?
+                       start_year = min(lubridate::year(observation_datetime)), # when did it started?
+                       n_sp = n_distinct(taxon_id),# number of unique species
+                       n_plot = n_distinct(plotID),# number plots per site
+                          .groups = "drop")%>%#why this line?
+              left_join(bird_elev_vars,by="siteID")
 
 write.csv(bird_vars,"./data/bird_vars.csv")
 
 ####plants####
 
 #extract plot level variables
-
-nlcd_div_plant<-data_plant%>%
-               select(siteID, plotID, elevation,nlcdClass)%>%
-               unique(.)%>%
-               group_by(siteID,nlcdClass)%>%
-               count()%>%
-               pivot_wider(names_from = "nlcdClass",  values_from = n,values_fill = 0)%>%
-               column_to_rownames("siteID")%>%
-               mutate(nlcd_div=(diversity(.)))%>%
-               select(nlcd_div)%>%
-               rownames_to_column("siteID")
-
-
-
-plant_vars <- data_plant%>%
-              select(siteID, plotID, elevation,nlcdClass)%>%
-              unique(.)%>%
-              group_by(siteID)%>%
-              summarise(elv_cv= sd(elevation)/mean(elevation), nlcd= n_distinct(nlcdClass))%>%
-              left_join(nlcd_div_plant,by="siteID")
-
-              
-write.csv(plant_vars,"./data/plant_vars.csv")
-
-
-####small mammals####
-
-#extract plot level variables
-
-nlcd_div_mammal<-data_small_mammal%>%
-                select(siteID, plotID, elevation,nlcdClass)%>%
+#calculate Shannon diversity for habitat types at each site
+nlcd_div_plant<- data_plant%>%
+                select(siteID, plotID, nlcdClass)%>%
                 unique(.)%>%
                 group_by(siteID,nlcdClass)%>%
                 count()%>%
@@ -119,14 +104,67 @@ nlcd_div_mammal<-data_small_mammal%>%
                 select(nlcd_div)%>%
                 rownames_to_column("siteID")
 
+#Calculate cv and mean of plot elevations per site and number of habitat types for each site
+plant_elev_vars <- data_plant%>%
+                  select(siteID, plotID, elevation,nlcdClass)%>%
+                  unique(.)%>%
+                  group_by(siteID)%>%
+                  summarise(elv_cv= sd(elevation)/mean(elevation), 
+                            mean_elev=mean(elevation),
+                            nlcd= n_distinct(nlcdClass))%>%
+                  left_join(nlcd_div_plant,by="siteID")
 
 
-mammal_vars <- data_small_mammal%>%
-               select(siteID, plotID, elevation,nlcdClass)%>%
-               unique(.)%>%
-               group_by(siteID)%>%
-               summarise(elv_cv= sd(elevation)/mean(elevation), nlcd= n_distinct(nlcdClass))%>%
-               left_join(nlcd_div_plant,by="siteID")
+#get site level richness, sample#, and year sampling began
+plant_vars <- data_plant %>% 
+            group_by(siteID) %>% 
+            summarise(n_observation = n_distinct(observation_datetime), # how many sample days in total?
+                      start_year = min(lubridate::year(observation_datetime)), # when did it started?
+                      n_sp = n_distinct(taxon_id),# number of unique species
+                      n_plot = n_distinct(plotID),# number plots per site
+                      .groups = "drop")%>%#why this line?
+            left_join(plant_elev_vars,by="siteID")
+
+
+              
+write.csv(plant_vars,"./data/plant_vars.csv")
+
+
+####small mammals####
+
+#extract plot level variables
+#calculate Shannon diversity for habitat types at each site
+nlcd_div_mammal<- data_small_mammal%>%
+                select(siteID, plotID, nlcdClass)%>%
+                unique(.)%>%
+                group_by(siteID,nlcdClass)%>%
+                count()%>%
+                pivot_wider(names_from = "nlcdClass",  values_from = n,values_fill = 0)%>%
+                column_to_rownames("siteID")%>%
+                mutate(nlcd_div=(diversity(.)))%>%
+                select(nlcd_div)%>%
+                rownames_to_column("siteID")
+
+#Calculate cv and mean of plot elevations per site and number of habitat types for each site
+mammal_elev_vars <- data_small_mammal%>%
+                    select(siteID, plotID, elevation,nlcdClass)%>%
+                    unique(.)%>%
+                    group_by(siteID)%>%
+                    summarise(elv_cv= sd(elevation)/mean(elevation), 
+                              mean_elev=mean(elevation),
+                              nlcd= n_distinct(nlcdClass))%>%
+                    left_join(nlcd_div_mammal,by="siteID")
+
+
+#get site level richness, sample#, and year sampling began
+mammal_vars <- data_small_mammal %>% 
+               group_by(siteID) %>% 
+               summarise(n_observation = n_distinct(observation_datetime), # how many sample days in total?
+                         start_year = min(lubridate::year(observation_datetime)), # when did it started?
+                         n_sp = n_distinct(taxon_id),# number of unique species
+                         n_plot = n_distinct(plotID),# number plots per site
+                         .groups = "drop")%>%#why this line?
+               left_join(mammal_elev_vars,by="siteID")
 
 write.csv(mammal_vars,"./data/mammal_vars.csv")
 
