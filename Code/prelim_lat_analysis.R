@@ -7,7 +7,7 @@ library(sars)
 #get latitude data
 site_data<-read.csv("Data/NEON_Field_Site_Metadata_20220412.csv")%>%
            select(2,12,13,21:25)%>%
-           rename(siteID=field_site_id,lat=field_latitude,long=field_longitude,mean_elev= field_mean_elevation_m,min_elev=field_minimum_elevation_m,
+           rename(siteID=field_site_id,lat=field_latitude,long=field_longitude,mean_elev2= field_mean_elevation_m,min_elev=field_minimum_elevation_m,
            max_elev=field_maximum_elevation_m,mean_temp=field_mean_annual_temperature_C, mean_precip=field_mean_annual_precipitation_mm)
 
 ####Beetle Lat analysis####
@@ -19,13 +19,15 @@ comb_beetle<-beetle_params%>%
              left_join(site_data,by="siteID")%>%
              left_join(beetle_vars,by="siteID")
 
-lat_mod<-lm(z~nlcd, data=comb_beetle)            
+pairs(comb_beetle[,c(2,3, 11:18)]) 
+
+lat_mod<-lm(z~mean_elev, data=comb_beetle)            
 summary(lat_mod) 
 
 plot(comb_beetle$mean_temp,comb_beetle$z, xlab="mean temperature", ylab="beetle z")
 abline(lat_mod<-lm(z~mean_temp, data=comb_beetle))  
 
-pairs(comb_beetle[,c(2:12)]) 
+
 
 
 ####Bird Lat analysis####
@@ -38,8 +40,12 @@ comb_bird<-bird_params%>%
            left_join(site_data,by="siteID")%>%
            left_join(bird_vars,by="siteID")
 
-lat_mod<-lm(z~elv_cv, data=comb_bird)            
+pairs(comb_bird[,c(2,3, 11:18)]) 
+
+lat_mod<-lm(z~long, data=comb_bird)            
 summary(lat_mod) 
+#species is really important for bird z
+#mean_elev is important
 
 plot(comb_bird$long,comb_bird$z,xlab="longitude", ylab="bird z")
 abline(lat_mod )
@@ -57,10 +63,13 @@ comb_mammal<-mammal_params%>%
              left_join(site_data,by="siteID")%>%
              left_join(mammal_vars,by="siteID")
 
-lat_mod<-lm(z~nlcd, data=comb_mammal)            
+pairs(comb_mammal[,c(2,3, 11:18)]) 
+
+#mean elev/cv_elv is important
+lat_mod<-lm(z~nlcd_div, data=comb_mammal)            
 summary(lat_mod) 
 
-plot(comb_mammal$mean_temp,comb_mammal$z,xlab="mean temperature", ylab="mammal z")
+plot(comb_mammal$mean_elev,comb_mammal$z,xlab="mean temperature", ylab="mammal z")
 abline(lat_mod)
 
 pairs(comb_mammal[,c(2:10)]) 
@@ -76,7 +85,10 @@ comb_plant<-plant_params%>%
             left_join(site_data,by="siteID")%>%
             left_join(plant_vars,by="siteID")
 
-lat_mod<-lm(z~nlcd, data=comb_plant)            
+pairs(comb_plant[,c(2,3, 11:18)]) 
+
+#nlcd importnat from plants
+lat_mod<-lm(z~nlcd_div, data=comb_plant)            
 summary(lat_mod) 
 
 plot(comb_mammal$mean_temp,comb_mammal$z,xlab="mean temperature", ylab="mammal z")
