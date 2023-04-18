@@ -15,7 +15,7 @@ library(sars)
 site_data<-read.csv("Data/NEON_Field_Site_Metadata_20220412.csv")%>%
            select(2,12,13,21:25)%>%
            rename(siteID=field_site_id,lat=field_latitude,long=field_longitude,mean_elev2= field_mean_elevation_m,min_elev=field_minimum_elevation_m,
-           max_elev=field_maximum_elevation_m,mean_temp=field_mean_annual_temperature_C, mean_precip=field_mean_annual_precipitation_mm)%>%
+           max_elev=field_maximum_elevation_m,mean_temp=field_mean_annual_temperature_C, mean_precip=field_mean_annual_precipitation_mm)
            #filter(.,siteID %in% ter_sites)
            #left_join(bio_clim,by="siteID")
 
