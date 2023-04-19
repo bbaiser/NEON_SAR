@@ -8,6 +8,7 @@ library(piecewiseSEM)
 library(lme4)
 library(lmerTest)
 library(DHARMa)
+library(car)
 
 
 #get site data
@@ -26,13 +27,15 @@ beetle_vars<-read.csv("Data/beetle_vars.csv",row=1)
 comb_beetle<-beetle_params%>%
              rename(siteID=X)%>%
              left_join(site_data,by="siteID")%>%
-             left_join(beetle_vars,by="siteID")
+             left_join(beetle_vars,by="siteID")%>%
+             subset(.,siteID!="GUAN"&siteID!="PUUM")#remove puerto rico and Hawaii sites
 
 
 #species richness model
 colnames(comb_beetle)
 
-beetle_rich<-glm(n_sp~lat+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, family=gaussian, data=comb_beetle)
-
+beetle_rich<-lm(n_sp~n_plot+start_year+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
+beetle_rich<-lm(z~n_sp, data=comb_beetle)
+vif(beetle_rich)
 summary(beetle_rich)
-plot(beetle_rich)
+plot(comb_beetle$n_observation,comb_beetle$n_sp)
