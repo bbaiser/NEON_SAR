@@ -29,7 +29,7 @@ comb_beetle<-beetle_params%>%
              rename(siteID=X)%>%
              left_join(site_data,by="siteID")%>%
              left_join(beetle_vars,by="siteID")%>%
-             subset(.,siteID!="GUAN"&siteID!="PUUM"&siteID!="STER"&siteID!="LAJA")%>%#remove puerto rico and Hawaii sites and STER
+             subset(.,siteID!="GUAN"& siteID!="PUUM"& siteID!="STER"& siteID!="LAJA")%>%#remove puerto rico and Hawaii sites and STER
              filter(n_observation>=20)#to filter out sites with less than 40 obs
 
 #species richness model
@@ -38,7 +38,8 @@ hist(comb_beetle$n_observation, breaks = 15)
 
 #model without lat because lat and temp are colinear (could run atemp model) 
 beetle_rich<-lm(n_sp~n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
-
+b<-lm(n_sp~mean_temp, data=comb_beetle)
+summary(b)
 vif(beetle_rich)
 summary(beetle_rich)
 plot(beetle_rich)
@@ -84,9 +85,9 @@ plot(beetle_sem_mod)
 ####Small_mammals####
 #get site data
 site_data<-read.csv("Data/NEON_Field_Site_Metadata_20220412.csv")%>%
-  select(2,12,13,21:25)%>%
-  rename(siteID=field_site_id,lat=field_latitude,long=field_longitude,mean_elev2= field_mean_elevation_m,min_elev=field_minimum_elevation_m,
-         max_elev=field_maximum_elevation_m,mean_temp=field_mean_annual_temperature_C, mean_precip=field_mean_annual_precipitation_mm)
+           select(2,12,13,21:25)%>%
+           rename(siteID=field_site_id,lat=field_latitude,long=field_longitude,mean_elev2= field_mean_elevation_m,min_elev=field_minimum_elevation_m,
+           max_elev=field_maximum_elevation_m,mean_temp=field_mean_annual_temperature_C, mean_precip=field_mean_annual_precipitation_mm)
 
 #get mammal SAR parameters
 mammal_params<-read.csv("Data/mammal_params.csv")
@@ -112,7 +113,7 @@ mammal_rich<-lm(n_sp~n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div
 vif(mammal_rich)
 summary(mammal_rich)
 plot(mammal_rich)
-plot(comb_mammal$n_observation,comb_mammal$n_sp)
+plot(comb_mammal$mean_elev,comb_mammal$n_sp)
 
 
 #c model
@@ -154,7 +155,75 @@ plot(mammal_sem_mod)
 
 ####birds####
 
+#get site data
+site_data<-read.csv("Data/NEON_Field_Site_Metadata_20220412.csv")%>%
+           select(2,12,13,21:25)%>%
+           rename(siteID=field_site_id,lat=field_latitude,long=field_longitude,mean_elev2= field_mean_elevation_m,min_elev=field_minimum_elevation_m,
+           max_elev=field_maximum_elevation_m,mean_temp=field_mean_annual_temperature_C, mean_precip=field_mean_annual_precipitation_mm)
 
+#get bird SAR parameters
+bird_params<-read.csv("Data/bird_params.csv")
+
+# get bird sampling covariates
+bird_vars<-read.csv("Data/bird_vars.csv",row=1)
+
+#combine into one dataframe
+comb_bird<-bird_params%>%
+           rename(siteID=X)%>%
+            left_join(site_data,by="siteID")%>%
+            left_join(bird_vars,by="siteID")%>%
+            subset(.,siteID!="GUAN"&siteID!="PUUM"&siteID!="LAJA")%>%#remove puerto rico and Hawaii sites
+            filter(n_observation>=20)#to filter out sites with less than 40 obs
+
+#species richness model
+colnames(comb_bird)
+hist(comb_bird$n_sp, breaks = 15)
+
+#model without lat because lat and temp are colinear (could run atemp model) 
+bird_rich<-lm(n_sp~n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
+
+vif(bird_rich)
+summary(bird_rich)
+plot(bird_rich)
+plot(comb_bird$n_observation,comb_bird$n_sp)
+
+
+#c model
+bird_c<-lm(c~n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
+
+vif(bird_c)
+summary(bird_c)
+plot(bird_c)
+
+#z model
+bird_z<-lm(z~c+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
+
+vif(bird_z)
+summary(bird_z)
+plot(bird_z) #point 35 is has high leverage
+
+
+#nlcd div  model
+bird_nlcd<-lm(nlcd_div~long+mean_temp+mean_precip+mean_elev, data=comb_bird)
+
+vif(bird_nlcd)
+summary(bird_nlcd)
+plot(bird_nlcd) #point 35 is has high leverage
+
+#elev_cv  model
+bird_elev<-lm(elv_cv~long+mean_temp+mean_precip+mean_elev, data=comb_bird)
+
+vif(bird_elev)
+summary(bird_elev)
+plot(bird_elev) #point 35 is has high leverage
+
+
+#piecwise sem model
+bird_sem_mod<-psem(bird_c,bird_z,bird_elev,bird_nlcd,bird_rich)
+
+
+summary(bird_sem_mod)
+plot(bird_sem_mod)
 
 ####plants####
 
@@ -222,7 +291,7 @@ plot(plant_elev) #point 35 is has high leverage
 
 
 #piecwise sem model
-plant_sem_mod<-psem(plant_c,plant_z,plant_elev,plant_nlcd,plant_rich, z %~~% n_sp)
+plant_sem_mod<-psem(plant_c,plant_z,plant_elev,plant_nlcd,plant_rich, z %~~% n_sp,nlcd_div %~~% n_observation)
 
 
 summary(plant_sem_mod)
