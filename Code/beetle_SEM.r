@@ -24,11 +24,20 @@ beetle_params<-read.csv("Data/beetle_params.csv")
 # get beetle sampling covariates
 beetle_vars<-read.csv("Data/beetle_vars.csv",row=1)
 
+#get inter plot distances
+beetle_dist<-read.csv("Data/organismalPlotMeanDist.csv",row=1)%>%
+             filter(taxon=="beetle")%>%
+             rename(siteID = site)%>%
+             select(siteID,aveDist)
+                   
+
+
 #combine into one dataframe
 comb_beetle<-beetle_params%>%
              rename(siteID=X)%>%
              left_join(site_data,by="siteID")%>%
              left_join(beetle_vars,by="siteID")%>%
+             left_join(beetle_dist,by="siteID")%>%
              subset(.,siteID!="GUAN"& siteID!="PUUM"& siteID!="STER"& siteID!="LAJA")%>%#remove puerto rico and Hawaii sites and STER
              filter(n_observation>=20)#to filter out sites with less than 40 obs
 
@@ -37,23 +46,22 @@ colnames(comb_beetle)
 hist(comb_beetle$n_observation, breaks = 15)
 
 #model without lat because lat and temp are colinear (could run atemp model) 
-beetle_rich<-lm(n_sp~n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
-b<-lm(n_sp~mean_temp, data=comb_beetle)
-summary(b)
+beetle_rich<-lm(n_sp~aveDist+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
+
 vif(beetle_rich)
 summary(beetle_rich)
 plot(beetle_rich)
 
 
 #c model
-beetle_c<-lm(c~n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
+beetle_c<-lm(c~aveDist+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
 
 vif(beetle_c)
 summary(beetle_c)
 plot(beetle_c)
 
 #z model
-beetle_z<-lm(z~c+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
+beetle_z<-lm(z~aveDist+c+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
 
 vif(beetle_z)
 summary(beetle_z)
@@ -95,11 +103,19 @@ mammal_params<-read.csv("Data/mammal_params.csv")
 # get mammal sampling covariates
 mammal_vars<-read.csv("Data/mammal_vars.csv",row=1)
 
+#get inter plot distances
+mammal_dist<-read.csv("Data/organismalPlotMeanDist.csv",row=1)%>%
+             filter(taxon=="mammal")%>%
+             rename(siteID = site)%>%
+             select(siteID,aveDist)
+
+
 #combine into one dataframe
 comb_mammal<-mammal_params%>%
               rename(siteID=X)%>%
               left_join(site_data,by="siteID")%>%
               left_join(mammal_vars,by="siteID")%>%
+              left_join(mammal_dist,by="siteID")%>%
               subset(.,siteID!="GUAN"&siteID!="PUUM"&siteID!="LAJA")%>%#remove puerto rico and Hawaii sites
               filter(n_observation>=20)#to filter out sites with less than 40 obs
 
@@ -108,7 +124,7 @@ colnames(comb_mammal)
 hist(comb_mammal$n_sp, breaks = 15)
 
 #model without lat because lat and temp are colinear (could run atemp model) 
-mammal_rich<-lm(n_sp~n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_mammal)
+mammal_rich<-lm(n_sp~aveDist+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_mammal)
 
 vif(mammal_rich)
 summary(mammal_rich)
@@ -117,14 +133,14 @@ plot(comb_mammal$mean_elev,comb_mammal$n_sp)
 
 
 #c model
-mammal_c<-lm(c~n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_mammal)
+mammal_c<-lm(c~aveDist+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_mammal)
 
 vif(mammal_c)
 summary(mammal_c)
 plot(mammal_c)
 
 #z model
-mammal_z<-lm(z~c+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_mammal)
+mammal_z<-lm(z~aveDist+c+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_mammal)
 
 vif(mammal_z)
 summary(mammal_z)
@@ -167,11 +183,18 @@ bird_params<-read.csv("Data/bird_params.csv")
 # get bird sampling covariates
 bird_vars<-read.csv("Data/bird_vars.csv",row=1)
 
+#get inter plot distances
+bird_dist<-read.csv("Data/organismalPlotMeanDist.csv",row=1)%>%
+            filter(taxon=="plant")%>%
+            rename(siteID = site)%>%
+            select(siteID,aveDist)
+
 #combine into one dataframe
 comb_bird<-bird_params%>%
            rename(siteID=X)%>%
             left_join(site_data,by="siteID")%>%
             left_join(bird_vars,by="siteID")%>%
+            left_join(bird_dist,by="siteID")%>%
             subset(.,siteID!="GUAN"&siteID!="PUUM"&siteID!="LAJA")%>%#remove puerto rico and Hawaii sites
             filter(n_observation>=20)#to filter out sites with less than 40 obs
 
@@ -180,7 +203,7 @@ colnames(comb_bird)
 hist(comb_bird$n_sp, breaks = 15)
 
 #model without lat because lat and temp are colinear (could run atemp model) 
-bird_rich<-lm(n_sp~n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
+bird_rich<-lm(n_sp~aveDist+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
 
 vif(bird_rich)
 summary(bird_rich)
@@ -189,14 +212,14 @@ plot(comb_bird$n_observation,comb_bird$n_sp)
 
 
 #c model
-bird_c<-lm(c~n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
+bird_c<-lm(c~aveDist+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
 
 vif(bird_c)
 summary(bird_c)
 plot(bird_c)
 
 #z model
-bird_z<-lm(z~c+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
+bird_z<-lm(z~aveDist+c+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
 
 vif(bird_z)
 summary(bird_z)
