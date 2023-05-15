@@ -185,7 +185,7 @@ bird_vars<-read.csv("Data/bird_vars.csv",row=1)
 
 #get inter plot distances
 bird_dist<-read.csv("Data/organismalPlotMeanDist.csv",row=1)%>%
-            filter(taxon=="plant")%>%
+            filter(taxon=="bird")%>%
             rename(siteID = site)%>%
             select(siteID,aveDist)
 
@@ -262,11 +262,17 @@ plant_params<-read.csv("Data/plant_params.csv")
 # get plant sampling covariates
 plant_vars<-read.csv("Data/plant_vars.csv",row=1)
 
+plant_dist<-read.csv("Data/organismalPlotMeanDist.csv",row=1)%>%
+            filter(taxon=="plant")%>%
+            rename(siteID = site)%>%
+            select(siteID,aveDist)
+
 #combine into one dataframe
 comb_plant<-plant_params%>%
             rename(siteID=X)%>%
             left_join(site_data,by="siteID")%>%
             left_join(plant_vars,by="siteID")%>%
+            left_join(plant_dist,by="siteID")%>%
             subset(.,siteID!="GUAN"&siteID!="PUUM"&siteID!="LAJA")%>%#remove puerto rico and Hawaii sites
             filter(n_observation>=20)#to filter out sites with less than 40 obs
 
@@ -275,7 +281,7 @@ colnames(comb_plant)
 hist(comb_plant$n_sp, breaks = 15)
 
 #model without lat because lat and temp are colinear (could run atemp model) 
-plant_rich<-lm(n_sp~n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_plant)
+plant_rich<-lm(n_sp~aveDist+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_plant)
 
 vif(plant_rich)
 summary(plant_rich)
@@ -284,14 +290,14 @@ plot(comb_plant$n_observation,comb_plant$n_sp)
 
 
 #c model
-plant_c<-lm(c~n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_plant)
+plant_c<-lm(c~aveDist+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_plant)
 
 vif(plant_c)
 summary(plant_c)
 plot(plant_c)
 
 #z model
-plant_z<-lm(z~c+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_plant)
+plant_z<-lm(z~aveDist+c+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_plant)
 
 vif(plant_z)
 summary(plant_z)
