@@ -9,7 +9,7 @@ library(lme4)
 library(lmerTest)
 library(DHARMa)
 library(car)
-install.packages("semPaths")
+#install.packages("semPaths")
 
 ####beetle####
 #get site data
