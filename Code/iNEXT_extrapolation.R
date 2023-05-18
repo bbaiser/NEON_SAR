@@ -32,23 +32,19 @@ beetle_df <- data_beetle %>%
 
 #run species iNEXT for one site        
 #zz<-vegan::specaccum(beetle_df[,-1], method = "exact", subset = beetle_df$siteID=="ABBY")   
-plot(zz)
+#plot(zz)
 
 
-dat<-beetle_df%>%
-     filter(siteID=="ABBY")%>%
-     #select( -siteID)%>%
-     t()%>%
+#dat<-beetle_df%>%
+#     filter(siteID=="ABBY")%>%
+#     #select( -siteID)%>%
+#     t()%>%
      
 
-
 lm<-split(beetle_df,beetle_df$siteID)%>%
-     lapply(., function(x)x[,-1 ])%>%
-      lapply(.,t)
-str(mls)
-dd<-lm$ABBY
+    lapply(., function(x)x[,-1 ])%>%
+    lapply(.,t)
 
-ddat<-as.data.frame
 
 out.raw <- iNEXT(lm, q = 0, datatype="incidence_raw")
 
@@ -59,8 +55,22 @@ palette <- sample(c("color1", "color2", ...), 47, replace = TRUE)
 
 scale_fill_manual(values=palette)
 
+####plot####
 
-ggiNEXT(out.raw)
+list.of.packages <- c("rstudioapi","fBasics","grDevices")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+pal <- topo.colors(n = 47)
+pal
+
+par(mar = rep(0, 4))
+pie(rep(1, length(pal)), col = pal)
+
+ggiNEXT(out.raw,color.var="Assemblage")
+data(spider)
+z <- iNEXT(spider, q=c(0), datatype="abundance")
+p1 <- ggiNEXT(z)
 
 
 qw<-lm$ABBY
