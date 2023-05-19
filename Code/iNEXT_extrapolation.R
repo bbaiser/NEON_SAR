@@ -12,14 +12,12 @@ install.packages("iNEXT")
 library(iNEXT)
 install.packages("sars")
 library(sars)
-
-
+install.packages("ggforce")
+library(ggforce)
 
 ####Beetles####
-# assuming that you just want the species richness of each plotID
 
-
-#obtain a site by species data frame th
+#obtain a site by species data frame for all sites
 beetle_df <- data_beetle %>% 
             select(siteID, plotID, taxon_name) %>% 
             mutate(present = 1) %>% 
@@ -29,54 +27,29 @@ beetle_df <- data_beetle %>%
             remove_rownames() %>%
             column_to_rownames(var = 'plotID')    
 
-
-#run species iNEXT for one site        
-#zz<-vegan::specaccum(beetle_df[,-1], method = "exact", subset = beetle_df$siteID=="ABBY")   
-#plot(zz)
-
-
-#dat<-beetle_df%>%
-#     filter(siteID=="ABBY")%>%
-#     #select( -siteID)%>%
-#     t()%>%
      
-
+#make a list of matrices (site-by-species) to run in iNEXT
 lm<-split(beetle_df,beetle_df$siteID)%>%
     lapply(., function(x)x[,-1 ])%>%
     lapply(.,t)
 
-
+#Run iNEXT for species richness q=0)
 out.raw <- iNEXT(lm, q = 0, datatype="incidence_raw")
 
+#SUBSET FOR SPECIES RICHNESS ONLY
+ex<-out.raw$AsyEst%>%
+    filter(Diversity=="Species richness")
 
 
-set.seed(23)
-palette <- sample(c("color1", "color2", ...), 47, replace = TRUE)
 
-scale_fill_manual(values=palette)
 
 ####plot####
 
-list.of.packages <- c("rstudioapi","fBasics","grDevices")
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages)
-
-pal <- topo.colors(n = 47)
-pal
-
-par(mar = rep(0, 4))
-pie(rep(1, length(pal)), col = pal)
-
-ggiNEXT(out.raw,color.var="Assemblage")
-data(spider)
-z <- iNEXT(spider, q=c(0), datatype="abundance")
-p1 <- ggiNEXT(z)
+p1<-ggiNEXT(out.raw,facet.var="Assemblage", type=3)
+p1+facet_wrap_paginate(~Assemblage, ncol = 3, nrow = 3, page = 6)
 
 
-qw<-lm$ABBY
-str(ciliates$EtoshaPan)
 
-str(ddat)
 #make a list of site names
 site_list <- unique(beetle_df$siteID)
 
