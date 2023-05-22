@@ -22,6 +22,7 @@ beetle_df <- data_beetle %>%
             select(siteID, plotID, taxon_name) %>% 
             mutate(present = 1) %>% 
             group_by(plotID, taxon_name, siteID) %>% 
+            group_by(plotID, taxon_name, siteID) %>% 
             summarise(present = sum(present)/sum(present)) %>% 
             pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0)%>%  
             remove_rownames() %>%
@@ -45,8 +46,8 @@ ex<-out.raw$AsyEst%>%
 
 ####plot####
 
-p1<-ggiNEXT(out.raw,facet.var="Assemblage", type=3)
-p1+facet_wrap_paginate(~Assemblage, ncol = 3, nrow = 3, page = 6)
+p1<-ggiNEXT(out.raw,facet.var="Assemblage", type=1)
+p1+facet_wrap_paginate(~Assemblage, ncol = 3, nrow = 3, page = 3)
 
 
 
