@@ -43,7 +43,6 @@ ex<-out.raw$AsyEst%>%
 
 
 
-
 ####plot####
 
 p1<-ggiNEXT(out.raw,facet.var="Assemblage", type=1)
