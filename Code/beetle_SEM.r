@@ -42,7 +42,7 @@ comb_beetle<-beetle_params%>%
              left_join(beetle_dist,by="siteID")%>%
              left_join(beetle_rar,by="siteID")%>%
              subset(.,siteID!="GUAN"& siteID!="PUUM"& siteID!="LAJA")%>%#remove puerto rico and Hawaiian sites 
-             #filter(n_observation>=20)#to filter out sites with less than 40 obs
+             filter(percent>=.80)#to filter out sites with less than 40 obs
 
 #species richness model
 colnames(comb_beetle)
@@ -112,6 +112,9 @@ mammal_dist<-read.csv("Data/organismalPlotMeanDist.csv",row=1)%>%
              rename(siteID = site)%>%
              select(siteID,aveDist)
 
+#get rarefaction information
+
+mammal_rar<-read.csv("Data/mammal_rar.csv",row=1)
 
 #combine into one dataframe
 comb_mammal<-mammal_params%>%
@@ -119,8 +122,9 @@ comb_mammal<-mammal_params%>%
               left_join(site_data,by="siteID")%>%
               left_join(mammal_vars,by="siteID")%>%
               left_join(mammal_dist,by="siteID")%>%
-              subset(.,siteID!="GUAN"&siteID!="PUUM"&siteID!="LAJA")%>%#remove puerto rico and Hawaii sites
-              filter(n_observation>=20)#to filter out sites with less than 40 obs
+              left_join(mammal_rar,by="siteID")%>%
+              subset(.,siteID!="GUAN"& siteID!="PUUM"& siteID!="LAJA")%>%#remove puerto rico and Hawaiian sites 
+              filter(percent>=.90)
 
 #species richness model
 colnames(comb_mammal)
@@ -132,7 +136,7 @@ mammal_rich<-lm(n_sp~aveDist+n_observation+long+mean_temp+mean_precip+mean_elev+
 vif(mammal_rich)
 summary(mammal_rich)
 plot(mammal_rich)
-plot(comb_mammal$mean_elev,comb_mammal$n_sp)
+
 
 
 #c model
