@@ -30,7 +30,9 @@ beetle_dist<-read.csv("Data/organismalPlotMeanDist.csv",row=1)%>%
              rename(siteID = site)%>%
              select(siteID,aveDist)
                    
+#get rarefaction information
 
+beetle_rar<-read.csv("Data/beetle_rar.csv",row=1)
 
 #combine into one dataframe
 comb_beetle<-beetle_params%>%
@@ -38,8 +40,9 @@ comb_beetle<-beetle_params%>%
              left_join(site_data,by="siteID")%>%
              left_join(beetle_vars,by="siteID")%>%
              left_join(beetle_dist,by="siteID")%>%
-             subset(.,siteID!="GUAN"& siteID!="PUUM"& siteID!="STER"& siteID!="LAJA")%>%#remove puerto rico and Hawaii sites and STER
-             filter(n_observation>=20)#to filter out sites with less than 40 obs
+             left_join(beetle_rar,by="siteID")%>%
+             subset(.,siteID!="GUAN"& siteID!="PUUM"& siteID!="LAJA")%>%#remove puerto rico and Hawaiian sites 
+             #filter(n_observation>=20)#to filter out sites with less than 40 obs
 
 #species richness model
 colnames(comb_beetle)
