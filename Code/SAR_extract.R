@@ -229,7 +229,14 @@ bird_df <- data_bird %>%
 
 
 #run species acc for one site        
-#zz<-vegan::specaccum(bird_df[,-1], method = "exact", subset = bird_df$siteID=="ABBY")   
+!zz<-vegan::specaccum(bird_df[,-1], method = "exact", subset = bird_df$siteID=="OSBS")   
+
+
+#plot for one site
+#plot(zz, ci.type = 'poly', ci.lty=0, col='blue', lwd=2, ci.col='lightblue', xlab="Plots",ylab="Species Richenss") #
+#title("OSBS Birds")
+#grid()
+
 
 #make a list of site names
 site_list <- unique(bird_df$siteID)
@@ -241,6 +248,10 @@ for(i in site_list) {
   acc<-vegan::specaccum(bird_df[,-1], method = "exact", subset = bird_df$siteID==i)
   rich[[i]]<-acc$richness#extract the richness for each site number
 }
+
+
+
+
 
 
 #this is the number of plots at each location
@@ -269,8 +280,17 @@ matrixe
 
 
 #extract area and sprich from one site and run 
-area<-na.omit(cumsum(matrixe[2,-1]))
-sp_rich<-unlist(rich[2])
+area<-na.omit(cumsum(matrixe[29,-1]))
+sp_rich<-unlist(rich[29])
+
+#plot sar for one site
+#model<-lm(log10(sp_rich)~log10(area))
+#summary(model)
+#plot(log10(area), log10(sp_rich),pch=20, col='blue',cex.lab=1.25, lwd=2, xlab=expression(log[10](m^2)),ylab=expression(log[10](Richness)))
+#abline(model, col="blue")
+#title("OSBS Birds")
+#grid()
+
 
 #for loop the sar_power function from the "sars" package over the site richness area data
 
