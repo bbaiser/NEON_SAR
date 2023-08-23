@@ -124,11 +124,13 @@ comb_mammal<-mammal_params%>%
               left_join(mammal_dist,by="siteID")%>%
               left_join(mammal_rar,by="siteID")%>%
               subset(.,siteID!="GUAN"& siteID!="PUUM"& siteID!="LAJA")%>%#remove puerto rico and Hawaiian sites 
-              filter(percent>=.90)
+              filter(percent>=.75)
 
 #species richness model
-colnames(comb_mammal)
+dim(comb_mammal)
 hist(comb_mammal$n_sp, breaks = 15)
+
+
 
 #model without lat because lat and temp are colinear (could run atemp model) 
 mammal_rich<-lm(n_sp~aveDist+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_mammal)
@@ -136,7 +138,6 @@ mammal_rich<-lm(n_sp~aveDist+n_observation+long+mean_temp+mean_precip+mean_elev+
 vif(mammal_rich)
 summary(mammal_rich)
 plot(mammal_rich)
-
 
 
 #c model
@@ -225,12 +226,12 @@ vif(bird_c)
 summary(bird_c)
 plot(bird_c)
 
-#z model
-bird_z<-lm(z~aveDist+c+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
+#z model (based on AIC, use c over n_sp due to high correlation between c and nsp)
+bird_z<-lm(z~aveDist+c+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_bird)
 
 vif(bird_z)
 summary(bird_z)
-plot(bird_z) #point 35 is has high leverage
+plot(comb_bird$n_sp,comb_bird$z) #point 35 is has high leverage
 
 
 #nlcd div  model
@@ -303,10 +304,12 @@ vif(plant_c)
 summary(plant_c)
 plot(plant_c)
 
-#z model
-plant_z<-lm(z~aveDist+c+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_plant)
+#z model(deal with n_sp,nobs_c colinerity )
+plant_z<-lm(z~aveDist+c+n_sp++n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_plant)
 
 vif(plant_z)
+
+AIC(plant_z)
 summary(plant_z)
 plot(plant_z) #point 35 is has high leverage
 
@@ -327,7 +330,8 @@ plot(plant_elev) #point 35 is has high leverage
 
 
 #piecwise sem model
-plant_sem_mod<-psem(plant_c,plant_z,plant_elev,plant_nlcd,plant_rich, z %~~% n_sp,nlcd_div %~~% n_observation)
+plant_sem_mod<-psem(plant_c,plant_z,plant_elev,plant_nlcd,plant_rich)
+nlcd_div %~~% n_observation
 
 
 summary(plant_sem_mod)
