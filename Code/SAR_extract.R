@@ -25,7 +25,9 @@ beetle_df <- data_beetle %>%
              summarise(present = sum(present)/sum(present)) %>% 
              pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0)%>%  
              remove_rownames() %>%
-             column_to_rownames(var = 'plotID')    
+             column_to_rownames(var = 'plotID')  
+
+summarise_all(sum)
 
 #run species acc for one site        
 #zz<-vegan::specaccum(beetle_df[,-1], method = "exact", subset = beetle_df$siteID=="ABBY")   
@@ -443,13 +445,30 @@ write.csv(mammal_params,"./data/mammal_params.csv")
 ####bacteria####
 # assuming that you just want the species richness of each plotID
 
-#bacteria_df <-read.delim("Data/NEON_16S_OTU_TABLE_FOR_Baiser.txt",sep=',',header=T)#otu table from Freedman Lab
-head(bacteria_df, c(10, 5))#data frame is big, check out a section
+#bacteria_df <-read.delim("Data/NEON_16S_otu_table_reduced_rarefied_pres_abs.txt",sep=',',header=T)#otu table from Freedman Lab
+
+#check data frame
+head(bacteria_df, c(20, 5))#data frame is big, check out a section
+
+bacteria2<-bacteria_df %>% 
+           select(-c(X,siteID))%>%
+           slice(1:100)%>%
+           group_by(plotID)%>%
+           summarise_all(sum)
+
+bacteria[,1]
+print(unique(bacteria2[,1]))
+
+dim(bacteria2)
+
+#check data frame
+head(bacteria2, c(100, 5))#data frame is big, check out a section
 
 
-bacteria <- bacteria_df %>% 
-  select(-c(X)) %>% #remove first column
-  mutate_if(is.numeric, ~1 * (. > 0))
+
+
+
+
   
   mutate(present = 1) %>% 
   group_by(plotID, taxon_name, siteID) %>% 
