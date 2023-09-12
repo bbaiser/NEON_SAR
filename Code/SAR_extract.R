@@ -27,7 +27,7 @@ beetle_df <- data_beetle %>%
              remove_rownames() %>%
              column_to_rownames(var = 'plotID')  
 
-summarise_all(sum)
+
 
 #run species acc for one site        
 #zz<-vegan::specaccum(beetle_df[,-1], method = "exact", subset = beetle_df$siteID=="ABBY")   
@@ -50,6 +50,9 @@ plot_num<-beetle_df%>%
 
 #just make a vector of plot numbers for loop below
 plotnum<-plot_num$n
+
+mean(plot_num$n)#Mean plot number
+sd(plot_num$n)#sd plot number
 
 
 #make empty matrix to fill with for loop
@@ -128,13 +131,13 @@ d = data_plant
 
 # the code below works at 400 m^2
 plant_df <- d %>% 
-  select(siteID, plotID, taxon_name) %>% 
-  mutate(present = 1) %>% 
-  group_by(plotID, taxon_name, siteID) %>% 
-  summarise(present = sum(present)/sum(present)) %>% 
-  pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0)%>%  
-  remove_rownames() %>%
-  column_to_rownames(var = 'plotID')  
+          select(siteID, plotID, taxon_name) %>% 
+          mutate(present = 1) %>% 
+          group_by(plotID, taxon_name, siteID) %>% 
+          summarise(present = sum(present)/sum(present)) %>% 
+          pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0)%>%  
+          remove_rownames() %>%
+          column_to_rownames(var = 'plotID')  
 
 #run species acc for one site        
 #zz<-vegan::specaccum(plant_df[,-1], method = "exact", subset = plant_df$siteID=="ABBY")   
@@ -153,7 +156,13 @@ for(i in site_list) {
 
 #this is the number of plots at each location
 plot_num<-plant_df%>%
-  count(siteID)
+         count(siteID)
+
+#plot numbers
+min(plot_num$n)
+max(plot_num$n)
+mean(plot_num$n)
+sd(plot_num$n)
 
 #just make a vector of plot numbers for loop below
 plotnum<-plot_num$n
@@ -220,22 +229,23 @@ write.csv(plant_params,"./data/plant_params.csv")
 ####Birds####
 
 #obtain a site by species data frame th
-bird_df <- data_bird %>% 
-  select(siteID, plotID, taxon_name) %>% 
-  mutate(present = 1) %>% 
-  group_by(plotID, taxon_name, siteID) %>% 
-  summarise(present = sum(present)/sum(present)) %>% 
-  pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0)%>%  
-  remove_rownames() %>%
-  column_to_rownames(var = 'plotID')  
+bird_df <- data_bird %>%
+        filter(!(pointID=='21')) %>%#get rid of sites to small to have grids
+        select(siteID, plotID, taxon_name) %>% 
+        mutate(present = 1) %>% 
+        group_by(plotID, taxon_name, siteID) %>% 
+        summarise(present = sum(present)/sum(present)) %>% 
+        pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0)%>%  
+        remove_rownames() %>%
+        column_to_rownames(var = 'plotID')  
 
 
 #run species acc for one site        
-!zz<-vegan::specaccum(bird_df[,-1], method = "exact", subset = bird_df$siteID=="OSBS")   
+zz<-vegan::specaccum(bird_df[,-1], method = "exact", subset = bird_df$siteID=="OSBS")   
 
 
 #plot for one site
-#plot(zz, ci.type = 'poly', ci.lty=0, col='blue', lwd=2, ci.col='lightblue', xlab="Plots",ylab="Species Richenss") #
+plot(zz, ci.type = 'poly', ci.lty=0, col='blue', lwd=2, ci.col='lightblue', xlab="Plots",ylab="Species Richenss") #
 #title("OSBS Birds")
 #grid()
 
@@ -259,6 +269,12 @@ for(i in site_list) {
 #this is the number of plots at each location
 plot_num<-bird_df%>%
   count(siteID)
+
+#plot numbers
+min(plot_num$n)
+max(plot_num$n)
+mean(plot_num$n)
+sd(plot_num$n)
 
 #just make a vector of plot numbers for loop below
 plotnum<-plot_num$n
@@ -298,13 +314,13 @@ sp_rich<-unlist(rich[29])
 
 #make data frame for for loop
 bird_params <- data.frame(matrix(NA,
-                                   nrow = 47,
+                                   nrow = 32,
                                    ncol = 2),
                             row.names =site_list)
 colnames(bird_params)<-c("c","z")
 
 #run forloop extracting c and z parameters
-for(i in 1:47){
+for(i in 1:32){
   
   area<-na.omit(cumsum(matrixe[i,-1]))
   sp_rich<-unlist(rich[i])
@@ -333,11 +349,11 @@ write.csv(bird_params,"./data/bird_params.csv")
 
 ####Mammals####
 mammal_df <- data_small_mammal %>% 
-  select(plotID, taxon_name) %>% 
-  mutate(present = 1) %>% 
-  group_by(plotID, taxon_name) %>% 
-  summarise(present = sum(present), .groups = "drop") %>% 
-  pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0) 
+          select(plotID, taxon_name) %>% 
+          mutate(present = 1) %>% 
+          group_by(plotID, taxon_name) %>% 
+          summarise(present = sum(present), .groups = "drop") %>% 
+          pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0) 
 
 # if you want to convert it to a matrix / data frame with row names
 mammal_df = as.data.frame(mammal_df)
@@ -381,6 +397,15 @@ for(i in site_list) {
 #this is the number of plots at each location
 plot_num<-mammal_df%>%
   count(siteID)
+
+#plot numbers
+min(plot_num$n)
+max(plot_num$n)
+mean(plot_num$n)
+sd(plot_num$n)
+
+
+
 
 #just make a vector of plot numbers for loop below
 plotnum<-plot_num$n
