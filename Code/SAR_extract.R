@@ -570,7 +570,7 @@ for(i in 1:47){
 
 #data frame with parameters(note that c (intercept) is back transformed)
 beetle_params
-
+citation("sars")
 write.csv(beetle_params,"./data/beetle_params.csv")
 #fit multiple models#
 #fitC <- sar_multi(data = t_dat, obj = c("power", "loga", "monod"))
