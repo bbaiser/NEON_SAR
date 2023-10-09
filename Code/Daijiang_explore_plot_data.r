@@ -176,7 +176,7 @@ sp_rich_mammal = data_small_mammal |>
 good_plots<-as.data.frame(unique((sp_rich_plant_400m2$plotID)))#make a list of plotw with over 10 sampling events
 colnames(good_plots)<-"plotID"
 
-write.csv(good_plots,"Data/good_plant_plots.csv")
+write.csv(good_plots,"Data/good_mammal_plots.csv")
 
 # ticks ----
 View(data_tick)
