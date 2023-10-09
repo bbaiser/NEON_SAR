@@ -173,7 +173,7 @@ sp_rich_mammal = data_small_mammal |>
              filter(!((n_observation<5)))#remove plots with less than 10 observations
 
 
-good_plots<-as.data.frame(unique((sp_rich_plant_400m2$plotID)))#make a list of plotw with over 10 sampling events
+good_plots<-as.data.frame(unique((sp_rich_mammal$plotID)))#make a list of plotw with over 10 sampling events
 colnames(good_plots)<-"plotID"
 
 write.csv(good_plots,"Data/good_mammal_plots.csv")

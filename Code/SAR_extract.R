@@ -16,6 +16,7 @@ library(sars)
 ####Beetles####
 # assuming that you just want the species richness of each plotID
 
+good_beetle<-read.csv("data/good_beelte_plots.csv",row=1)#beetle plots that have been filtered for completeness
 
 #obtain a site by species data frame th
 beetle_df <- data_beetle %>% 
@@ -25,6 +26,7 @@ beetle_df <- data_beetle %>%
              summarise(present = sum(present)/sum(present)) %>% 
              pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0)%>%  
              remove_rownames() %>%
+             filter(plotID%in%good_beetle$plotID)%>%#take only "good" plots
              column_to_rownames(var = 'plotID')  
 
 
@@ -80,13 +82,13 @@ sp_rich<-unlist(rich[2])
 
 #make data frame for for loop
 beetle_params <- data.frame(matrix(NA,
-                                   nrow = 47,
+                                   nrow = 45,
                                    ncol = 2),
                             row.names =site_list)
 colnames(beetle_params)<-c("c","z")
 
 #run forloop extracting c and z parameters
-for(i in 1:47){
+for(i in 1:45){
   
   area<-na.omit(cumsum(matrixe[i,-1]))
   sp_rich<-unlist(rich[i])
@@ -125,6 +127,7 @@ write.csv(beetle_params,"./data/beetle_params.csv")
 
 # if at 100 m^2, need to use subplotID
 #d = filter(data_plant, sample_area_m2 %in% c("1", "10", "100"))
+good_plant<-read.csv("data/good_plant_plots.csv",row=1)#beetle plots that have been filtered for completeness
 
 # if at 400 m^2, use all data, i.e. combine all subplotID within each plotID
 d = data_plant
@@ -137,6 +140,7 @@ plant_df <- d %>%
           summarise(present = sum(present)/sum(present)) %>% 
           pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0)%>%  
           remove_rownames() %>%
+          filter(plotID%in%good_plant$plotID)%>%#take only "good" plots
           column_to_rownames(var = 'plotID')  
 
 #run species acc for one site        
@@ -227,7 +231,8 @@ write.csv(plant_params,"./data/plant_params.csv")
 
 
 ####Birds####
-
+good_bird<-read.csv("data/good_bird_plots.csv",row=1)#beetle plots that have been filtered for completeness
+#don't need to use good birds as of now because of filter out small grid "21" below
 #obtain a site by species data frame th
 bird_df <- data_bird %>%
         filter(!(pointID=='21')) %>%#get rid of sites to small to have grids
@@ -348,11 +353,14 @@ write.csv(bird_params,"./data/bird_params.csv")
 
 
 ####Mammals####
+good_mammal<-read.csv("data/good_mammal_plots.csv",row=1)#beetle plots that have been filtered for completeness
+
+
 mammal_df <- data_small_mammal %>% 
           select(plotID, taxon_name) %>% 
           mutate(present = 1) %>% 
           group_by(plotID, taxon_name) %>% 
-          summarise(present = sum(present), .groups = "drop") %>% 
+          summarise(present = sum(present), .groups = "drop") %>%
           pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0) 
 
 # if you want to convert it to a matrix / data frame with row names
@@ -376,6 +384,7 @@ mammal_df <- data_small_mammal%>%
   summarise(present = sum(present)/sum(present)) %>% 
   pivot_wider(names_from = taxon_name, values_from = present, values_fill = 0)%>%  
   remove_rownames() %>%
+  filter(plotID%in%good_mammal$plotID)%>%#take only "good" plots
   column_to_rownames(var = 'plotID')  
 
 
@@ -436,13 +445,13 @@ sp_rich<-unlist(rich[2])
 
 #make data frame for for loop
 mammal_params <- data.frame(matrix(NA,
-                                 nrow = 46,
+                                 nrow = 43,
                                  ncol = 2),
                           row.names =site_list)
 colnames(mammal_params)<-c("c","z")
 
 #run forloop extracting c and z parameters
-for(i in 1:46){
+for(i in 1:43){
   
   area<-na.omit(cumsum(matrixe[i,-1]))
   sp_rich<-unlist(rich[i])
