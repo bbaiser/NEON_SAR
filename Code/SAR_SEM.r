@@ -21,7 +21,7 @@ site_data<-read.csv("Data/NEON_Field_Site_Metadata_20220412.csv")%>%
 #get beetle SAR parameters
 beetle_params<-read.csv("Data/beetle_params.csv")
 
-# get beetle sampling covariates
+#get beetle sampling covariates
 beetle_vars<-read.csv("Data/beetle_vars.csv",row=1)
 
 #get inter plot distances
@@ -41,25 +41,27 @@ comb_beetle<-beetle_params%>%
              left_join(beetle_vars,by="siteID")%>%
              left_join(beetle_dist,by="siteID")%>%
              left_join(beetle_rar,by="siteID")%>%
-             subset(.,siteID!="GUAN"& siteID!="PUUM"& siteID!="LAJA")%>%#remove puerto rico and Hawaiian sites 
-             filter(percent>=.80)#to filter out sites with less than 40 obs
+             subset(.,siteID!="GUAN"& siteID!="PUUM"& siteID!="LAJA" &siteID!="STER")%>%#remove puerto rico and Hawaiian sites and STER as a massive outlier for c
+             #filter(percent>=.80)#to filter out sites with less than 40 obs
 
 #species richness model
 colnames(comb_beetle)
 hist(comb_beetle$n_observation, breaks = 15)
 
-#model without lat because lat and temp are colinear (could run atemp model) 
+#model without lat because lat and temp are colinear 
 beetle_rich<-lm(n_sp~aveDist+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
 
-vif(beetle_rich)
+vif(beetle_rich)#no multicolinearity for richness model
 summary(beetle_rich)
 plot(beetle_rich)
+
+
 
 
 #c model
 beetle_c<-lm(c~aveDist+n_sp+n_observation+long+mean_temp+mean_precip+mean_elev+nlcd_div+elv_cv, data=comb_beetle)
 
-vif(beetle_c)
+vif(beetle_c)#no multicolinearity for c model
 summary(beetle_c)
 plot(beetle_c)
 
