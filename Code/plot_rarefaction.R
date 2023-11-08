@@ -26,7 +26,7 @@ beetle_df <-  data_beetle %>%
               summarize(present = paste((present),collapse=", "))
 
 
-  #obtain number of samples per plot
+#obtain number of sampling bouts per plot
  n_samp <-  data_beetle %>% 
             unite('sample',plotID, boutID, remove=F )%>%
             select(sample, plotID) %>%
@@ -35,22 +35,15 @@ beetle_df <-  data_beetle %>%
             summarise(n = n()) 
  
 
- 
+# append the number of samples to the list of frequencies for rarefaction 
  rar_in<-beetle_df %>%
         left_join(n_samp, by="plotID")%>%
         unite('sample',n, present, sep= ",")%>%
-        column_to_rownames(var = 'plotID')  %>% 
-        mutate_if(is.character,as.numeric)
+        column_to_rownames(var = 'plotID') 
+ 
 
- z<-(rar_in[1,])
-x<-as.vector(z)
-as.numeric(as.list(x) )
- as.numeric(rar_in)
-data1 <- as.data.frame(rar_in)%>%
-         as.numeric(unlist(.))
-data_list <- split(data1,data1$plotID)
 
-data_list[["1"]]
+
 #make a list of matrices (site-by-species) to run in iNEXT
 lm<-split(rar_in,rar_in$plotID)%>%
   lapply(., function(x)x[,-1 ])%>%
